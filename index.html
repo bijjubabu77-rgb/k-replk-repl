@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Customer Support SaaS Dashboard</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;
+}
+
+body{
+    background:#081423;
+    color:#fff;
+    height:100vh;
+    overflow:hidden;
+}
+
+.dashboard{
+    display:flex;
+    height:100vh;
+}
+
+/* Sidebar */
+.sidebar{
+    width:250px;
+    background:#0b1d35;
+    padding:25px;
+    border-right:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    color:#6ec8ff;
+    margin-bottom:40px;
+}
+
+.sidebar button{
+    width:100%;
+    background:transparent;
+    border:none;
+    color:#d7e6ff;
+    padding:15px;
+    text-align:left;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    margin-bottom:12px;
+    transition:.3s;
+}
+
+.sidebar button:hover,
+.sidebar button.active{
+    background:#1b4ed8;
+    color:#fff;
+}
+
+/* Main */
+.main{
+    flex:1;
+    padding:30px;
+    overflow:auto;
+    background:linear-gradient(135deg,#081423,#102947);
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+h1{
+    margin-bottom:25px;
+}
+
+/* Cards */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#112a47;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.3);
+}
+
+.card h2{
+    font-size:16px;
+    color:#8dbdff;
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:30px;
+    font-weight:bold;
+}
+
+/* Chat Layout Fixed */
+.chat-layout{
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:20px;
+}
+
+.history-panel,
+.chat-panel{
+    background:#112a47;
+    border-radius:15px;
+    padding:20px;
+}
+
+.history-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.history-item{
+    background:#17375c;
+    padding:12px;
+    border-radius:10px;
+    white-space:normal;
+    word-wrap:break-word;
+    overflow-wrap:anywhere;
+    line-height:1.5;
+}
+
+.chat-window{
+    background:#081423;
+    border-radius:12px;
+    height:360px;
+    overflow-y:auto;
+    padding:15px;
+    margin-bottom:15px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.message{
+    padding:10px 14px;
+    border-radius:8px;
+    max-width:85%;
+    width: fit-content;
+    line-height:1.5;
+    word-wrap:break-word;
+    overflow-wrap:anywhere;
+}
+
+.user{
+    background:#1b7cff;
+    color:#fff;
+    align-self: flex-end;
+}
+
+.bot{
+    background:#17375c;
+    color:#90f7b1;
+    align-self: flex-start;
+}
+
+.chat-input{
+    display:flex;
+    gap:10px;
+}
+
+.chat-input input{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    outline:none;
+    background:#17375c;
+    color:white;
+}
+
+.chat-input button{
+    padding:12px 22px;
+    border:none;
+    border-radius:8px;
+    background:#1b7cff;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* Settings */
+.settings-box{
+    max-width:600px;
+    background:#112a47;
+    padding:25px;
+    border-radius:15px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    color:#9fc7ff;
+}
+
+input[type=text],
+input[type=password],
+textarea {
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#17375c;
+    color:white;
+    margin-bottom:20px;
+    outline:none;
+}
+
+.save-btn{
+    background:#1b7cff;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.status{
+    margin-top:15px;
+    color:#8effb4;
+}
+
+@media(max-width:900px){
+    .chat-layout{ grid-template-columns:1fr; }
+    .sidebar{ width:200px; }
+}
+
+@media(max-width:700px){
+    .dashboard{ flex-direction:column; }
+    .sidebar{ width:100%; display:flex; overflow-x:auto; gap:10px; padding:15px; }
+    .sidebar button{ min-width:160px; margin-bottom:0; padding:10px; text-align:center; }
+    .logo { display:none; }
+    .main{ padding:20px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar">
+        <div class="logo">🤖 AI SaaS</div>
+        <button class="nav active" onclick="switchPage('analytics', this)">📊 Analytics</button>
+        <button class="nav" onclick="switchPage('history', this)">💬 Chat History</button>
+        <button class="nav" onclick="switchPage('settings', this)">⚙ Settings</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main">
+
+        <!-- Analytics Page -->
+        <div id="analytics" class="page active">
+            <h1>Analytics Dashboard</h1>
+            <div class="cards">
+                <div class="card"><h2>Total Conversations</h2><p>12,548</p></div>
+                <div class="card"><h2>AI Accuracy</h2><p>99.4%</p></div>
+                <div class="card"><h2>Active Bots</h2><p>18</p></div>
+                <div class="card"><h2>Customer Satisfaction</h2><p>96%</p></div>
+            </div>
+        </div>
+
+        <!-- Chat History & Live Window Page -->
+        <div id="history" class="page">
+            <h1>Chat History & Live Bot</h1>
+            <div class="chat-layout">
+                <div class="history-panel">
+                    <h3 style="margin-bottom:15px; color:#8dbdff;">Recent Logs</h3>
+                    <div class="history-list">
+                        <div class="history-item"><strong>jt@gmail.com:</strong> Refund requested for item #102.</div>
+                        <div class="history-item"><strong>maya@web.com:</strong> Reset password email not received.</div>
+                        <div class="history-item"><strong>rahul@io.com:</strong> Integration error with webhook.</div>
+                    </div>
+                </div>
+                <div class="chat-panel">
+                    <div class="chat-window" id="chat-window">
+                        <div class="message bot">Hello! I am your AI assistant. Type a test message below! 🚀</div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chat-input-field" placeholder="Ask AI anything...">
+                        <button onclick="sendLiveMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings" class="page">
+            <h1>System Settings</h1>
+            <div class="settings-box">
+                <label>OpenAI API Key</label>
+                <input type="password" placeholder="sk-........................" value="xxxxxxxxxxxxxxxxxxxx">
+                <label>Bot Behavior Prompt</label>
+                <textarea style="width:100%; height:100px; background:#17375c; border:none; border-radius:8px; color:white; padding:12px; resize:none;">You are an expert customer support agent...</textarea>
+                <button class="save-btn" onclick="alert('Configurations Saved Successfully!')">Save Configurations</button>
+                <div class="status">● Connected to OpenAI API Node</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- JavaScript Logic to Fix All Bugs -->
+<script>
+function switchPage(pageId, button) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    // Remove active style from all buttons
+    document.querySelectorAll('.nav').forEach(btn => btn.classList.remove('active'));
+    
+    // Show targeted page and set button active
+    document.getElementById(pageId).classList.add('active');
+    button.classList.add('active');
+}
+
+function sendLiveMessage() {
+    const input = document.getElementById('chat-input-field');
+    const windowDiv = document.getElementById('chat-window');
+    if(input.value.trim() === "") return;
+
+    // Append User Message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user';
+    userMsg.innerText = input.value;
+    windowDiv.appendChild(userMsg);
+    
+    const text = input.value.toLowerCase();
+    input.value = "";
+    windowDiv.scrollTop = windowDiv.scrollHeight;
+
+    // Simulated Fast AI Processing
+    setTimeout(() => {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'message bot';
+        
+        if(text.includes('hi') || text.includes('hello')) {
+            botMsg.innerText = "Hey! This is your premium AI SaaS system running flawlessly on your device. ⚡";
+        } else if(text.includes('money') || text.includes('crore')) {
+            botMsg.innerText = "Target Confirmed: Sell this software to 50 businesses and cross the ₹1 Crore mark! 💰";
+        } else {
+            botMsg.innerText = "System Check: OpenAI API core node is 100% active and functioning. 🧠";
+        }
+        
+        windowDiv.appendChild(botMsg);
+        windowDiv.scrollTop = windowDiv.scrollHeight;
+    }, 600);
+}
+</script>
+
+</body>
+</html>
